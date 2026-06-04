@@ -1,5 +1,6 @@
 import { ScanJobStatus, type PrismaClient } from "@prisma/client";
 import { resolveScanObservedCounts } from "@/lib/scan-observed-counts";
+import { formatScanDateTime } from "@/lib/scan-format";
 import { resolveFindingRankVisual } from "@/lib/summary-rank-style";
 import type { SummarySourceSlice } from "@/lib/scan-summary";
 
@@ -20,6 +21,7 @@ export type DashboardLastScanSummary = {
   findings: number;
   urls: number;
   subdomains: number;
+  ips: number;
   href: string;
 };
 
@@ -72,17 +74,6 @@ function formatDuration(
   return `${s}s`;
 }
 
-function formatScannedAt(completedAt: Date | null, createdAt: Date) {
-  const d = completedAt ?? createdAt;
-  return d.toLocaleString(undefined, {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
 function buildDonutSlices(
   rows: DashboardFindingTypeRow[],
   total: number,
@@ -122,7 +113,7 @@ export async function loadDashboardInsights(prisma: PrismaClient): Promise<Dashb
   const [topTargets, lastCompletedScan, latestAnyScan, findingGroups] = await Promise.all([
     prisma.targetDomain.findMany({
       orderBy: [{ cachedFindingCount: "desc" }, { domainNormalized: "asc" }],
-      take: 6,
+      take: 7,
       select: {
         id: true,
         domainNormalized: true,
@@ -163,12 +154,13 @@ export async function loadDashboardInsights(prisma: PrismaClient): Promise<Dashb
       scanId: scan.id,
       domain: scan.targetDomain.domainNormalized,
       status: scan.status,
-      scannedAt: formatScannedAt(scan.completedAt, scan.createdAt),
+      scannedAt: formatScanDateTime(scan.completedAt ?? scan.createdAt),
       duration: formatDuration(scan.startedAt, scan.completedAt),
       scanIdShort: scan.id.slice(0, 8),
       findings: counts.findings,
       urls: counts.urls,
       subdomains: counts.subdomains,
+      ips: counts.ips,
       href: isCompleted ? `/scans/${scan.id}/observed` : `/scans/${scan.id}`,
     };
   }

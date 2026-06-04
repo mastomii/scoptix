@@ -22,7 +22,7 @@ const STATUS_BOX_CLASS =
   "inline-flex rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-normal";
 
 const SCAN_HISTORY_TABLE_GRID_CLASS =
-  "lg:grid-cols-[2.25rem_minmax(0,1.25fr)_minmax(8rem,max-content)_minmax(0,9.25rem)_minmax(5.5rem,0.75fr)_5rem_minmax(6.5rem,1fr)_minmax(6.5rem,1fr)_2.5rem]";
+  "lg:grid-cols-[2.25rem_minmax(0,1.25fr)_minmax(8rem,max-content)_minmax(0,9.25rem)_minmax(5.5rem,0.75fr)_6rem_minmax(5.75rem,1fr)_minmax(6.5rem,1fr)_2.5rem]";
 
 /** Spacing between columns without grid gap (gap would show through header bg). */
 const SCAN_SUBGRID_ROW_CLASS = "grid grid-cols-subgrid [&>*]:pr-3 [&>*:last-child]:pr-0";
@@ -191,15 +191,15 @@ export function ScanHistoryPanel({ scans }: { scans: ScanHistoryRow[] }) {
                   </div>
                   <div className="font-mono text-[11px] tabular-nums text-muted">
                     <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted">
-                      Finished
-                    </div>
-                    {scan.finishedLabel}
-                  </div>
-                  <div className="font-mono text-[11px] tabular-nums text-muted">
-                    <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted">
                       Created
                     </div>
                     {scan.createdLabel}
+                  </div>
+                  <div className="font-mono text-[11px] tabular-nums text-muted">
+                    <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted">
+                      Finished
+                    </div>
+                    {scan.finishedLabel}
                   </div>
                 </Link>
               </div>
@@ -231,8 +231,8 @@ export function ScanHistoryPanel({ scans }: { scans: ScanHistoryRow[] }) {
           <div className="min-w-0 truncate">Phase</div>
           <div className="tabular-nums">URLs</div>
           <div className="tabular-nums">Findings</div>
-          <div className="tabular-nums">Finished</div>
           <div className="tabular-nums">Created</div>
+          <div className="tabular-nums">Finished</div>
           <div aria-hidden />
         </div>
 
@@ -288,13 +288,13 @@ export function ScanHistoryPanel({ scans }: { scans: ScanHistoryRow[] }) {
                 href={scan.href}
                 className="font-mono text-[11px] tabular-nums text-muted transition-colors hover:text-cream"
               >
-                {scan.finishedLabel}
+                {scan.createdLabel}
               </Link>
               <Link
                 href={scan.href}
                 className="font-mono text-[11px] tabular-nums text-muted transition-colors hover:text-cream"
               >
-                {scan.createdLabel}
+                {scan.finishedLabel}
               </Link>
               <div className="flex justify-end">
                 <button

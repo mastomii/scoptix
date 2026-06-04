@@ -52,17 +52,12 @@ export function formatHostnameCountLabel(count: number) {
   return n === 1 ? "1 subdomain" : `${n.toLocaleString()} subdomains`;
 }
 
+/** Scan/target lists & headers — UTC, `YYYY-MM-DD HH:mm` (matches scan history table). */
 export function formatScanDateTime(value: Date | string | null | undefined) {
   if (!value) return "—";
   const d = typeof value === "string" ? new Date(value) : value;
   if (Number.isNaN(d.getTime())) return "—";
-  return d.toLocaleString(undefined, {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  return d.toISOString().slice(0, 16).replace("T", " ");
 }
 
 export function formatScanDuration(

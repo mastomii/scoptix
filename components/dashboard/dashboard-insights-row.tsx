@@ -15,6 +15,7 @@ import {
   IconGlobe,
   IconLink,
   IconList,
+  IconServer,
 } from "@/components/ui-icons";
 import type { DashboardInsightsData } from "@/lib/dashboard-insights";
 
@@ -141,6 +142,11 @@ export function DashboardInsightsRow({ data }: { data: DashboardInsightsData }) 
                 label="Subdomains"
                 value={scan.subdomains.toLocaleString()}
               />
+              <ChangeMetricLine
+                icon={<IconServer className="size-3.5" />}
+                label="IP Addresses"
+                value={scan.ips.toLocaleString()}
+              />
               <hr className="my-1 border-line" />
               <ChangeMetricLine
                 icon={<IconClock className="size-3.5" />}
@@ -154,7 +160,7 @@ export function DashboardInsightsRow({ data }: { data: DashboardInsightsData }) 
                 mono
               />
             </div>
-            <Link href={scan.href} className="scx-summary-compare-btn mt-4">
+            <Link href={scan.href} className="scx-summary-compare-btn mt-6">
               <IconArrowLeftRight className="mr-2 size-3.5" />
               View scan results
               <IconArrowRight className="ml-2 size-3.5" />

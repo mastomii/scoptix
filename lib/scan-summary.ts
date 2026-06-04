@@ -18,6 +18,7 @@ import {
   type UrlCategoryCounts,
 } from "@/lib/extension-category";
 import { getObservedAvailability } from "@/lib/scan-observed";
+import { formatScanDateTime } from "@/lib/scan-format";
 import {
   findDedupedTargetFindingIds,
   groupDedupedTargetFindingsByType,
@@ -179,10 +180,6 @@ function buildRankRows(
       icon: visual.icon,
     };
   });
-}
-
-function formatFindingFoundAt(value: Date) {
-  return value.toISOString().slice(0, 16).replace("T", " ");
 }
 
 /** Donut segment colors aligned with sampleimg.png (green Wayback, purple VT). */
@@ -520,7 +517,7 @@ export async function loadTargetSummary(targetDomainId: string): Promise<ScanSum
       ? f.snippet.length > 80
         ? `${f.snippet.slice(0, 80)}…`
         : f.snippet
-      : `Found ${formatFindingFoundAt(f.createdAt)}`,
+      : `Found ${formatScanDateTime(f.createdAt)}`,
   }));
 
   const { sources, urlTotalForSources } = await loadTargetUrlSources(targetDomainId);
@@ -686,7 +683,7 @@ export async function loadScanSummary(
       ? f.snippet.length > 80
         ? `${f.snippet.slice(0, 80)}…`
         : f.snippet
-      : `Found ${formatFindingFoundAt(f.createdAt)}`,
+      : `Found ${formatScanDateTime(f.createdAt)}`,
   }));
 
   const enabledEngines = parseScanEnginesEnabled(scanJob?.config);

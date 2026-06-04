@@ -6,6 +6,7 @@ import {
   canViewPartialObservedResults,
   partialObservedPhaseLabel,
 } from "@/lib/scan-observed";
+import { formatScanDateTime } from "@/lib/scan-format";
 
 type ScanData = {
   id: string;
@@ -208,7 +209,7 @@ export function ScanDetailClient({ id }: { id: string }) {
           </div>
           {scan.completedAt && (
             <div className="mt-2 text-[11px] text-muted">
-              Finished at {scan.completedAt.slice(0, 19).replace("T", " ")} UTC
+              Finished at {formatScanDateTime(scan.completedAt)}
             </div>
           )}
         </div>
@@ -257,9 +258,9 @@ export function ScanDetailClient({ id }: { id: string }) {
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
           ["Scan ID", id.slice(0, 8) + "…"],
-          ["Created", scan.createdAt?.slice(0, 16).replace("T", " ") ?? "—"],
-          ["Started", scan.startedAt?.slice(0, 16).replace("T", " ") ?? "—"],
-          ["Finished", scan.completedAt?.slice(0, 16).replace("T", " ") ?? "—"],
+          ["Created", formatScanDateTime(scan.createdAt)],
+          ["Started", formatScanDateTime(scan.startedAt)],
+          ["Finished", formatScanDateTime(scan.completedAt)],
         ].map(([label, val]) => (
           <div key={label} className="rounded-xl border border-line bg-black/10 px-3 py-2.5">
             <div className="text-[10px] font-semibold uppercase tracking-wider text-muted">

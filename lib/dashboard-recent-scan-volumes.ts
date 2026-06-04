@@ -1,5 +1,6 @@
 import { ScanJobStatus, type PrismaClient } from "@prisma/client";
 import { resolveScanObservedCounts } from "@/lib/scan-observed-counts";
+import { formatScanDateTime } from "@/lib/scan-format";
 
 export const RECENT_SCAN_VOLUME_COUNT = 7;
 
@@ -20,16 +21,6 @@ export type DashboardRecentScanVolumeRow = {
 function barWidthPercent(count: number, max: number): number {
   if (max <= 0 || count <= 0) return 0;
   return Math.max(4, Math.round((count / max) * 100));
-}
-
-function formatCreatedAt(completedAt: Date | null, createdAt: Date): string {
-  const d = completedAt ?? createdAt;
-  return d.toLocaleString(undefined, {
-    day: "numeric",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
 }
 
 export async function loadDashboardRecentScanVolumes(
@@ -75,7 +66,7 @@ export async function loadDashboardRecentScanVolumes(
       scanId: scan.id,
       domain: scan.targetDomain.domainNormalized,
       status: scan.status,
-      createdLabel: formatCreatedAt(scan.completedAt, scan.createdAt),
+      createdLabel: formatScanDateTime(scan.completedAt ?? scan.createdAt),
       href: isCompleted ? `/scans/${scan.id}/observed` : `/scans/${scan.id}`,
       findings,
       urls,

@@ -1,4 +1,5 @@
 import { EngineProvider, ScanJobStatus, type PrismaClient } from "@prisma/client";
+import { buildDashboardDiscoveryPoints, type DiscoveryChartPoint } from "@/lib/discovery-chart";
 import { PER_KEY_PER_DAY, resolveUsageCounters } from "@/lib/quota-constants";
 
 export type ActivityBucket = { key: string; label: string; count: number };
@@ -43,23 +44,27 @@ export function getActivityRangeConfig(key: ActivityRangeKey): ActivityRangeConf
 
 /** Query params for sibling chart ranges (preserved when one chart changes range). */
 export function dashboardChartRangeParams(
-  scanRange: ActivityRangeKey,
   findingsRange: ActivityRangeKey,
 ): Record<string, string> {
   const params: Record<string, string> = {};
-  if (scanRange !== DEFAULT_ACTIVITY_RANGE) params.scanRange = scanRange;
   if (findingsRange !== DEFAULT_ACTIVITY_RANGE) params.findingsRange = findingsRange;
   return params;
 }
 
+export type ActivitySeriesSource =
+  | "scan_job"
+  | "analysis_finding"
+  | "discovered_url"
+  | "subdomain";
+
 export async function loadActivitySeriesForRange(
   prisma: PrismaClient,
   rangeKey: ActivityRangeKey,
-  table: "scan_job" | "analysis_finding",
+  source: ActivitySeriesSource,
 ): Promise<{ buckets: ActivityBucket[]; range: ActivityRangeConfig }> {
   const range = getActivityRangeConfig(rangeKey);
   const since = activitySince(range);
-  const buckets = await loadActivitySeries(prisma, range, table, since);
+  const buckets = await loadActivitySeries(prisma, range, source, since);
   return { buckets, range };
 }
 
@@ -162,7 +167,7 @@ function rawBucketKey(day: Date | string): string {
 async function loadActivitySeries(
   prisma: PrismaClient,
   range: ActivityRangeConfig,
-  table: "scan_job" | "analysis_finding",
+  source: ActivitySeriesSource,
   since: Date,
 ): Promise<ActivityBucket[]> {
   type RawBucketCount = { bucket: Date; count: number };
@@ -170,22 +175,42 @@ async function loadActivitySeries(
   const trunc = range.bucket === "month" ? "month" : range.bucket === "week" ? "week" : "day";
   const template = buildActivityBuckets(range);
 
-  const rows =
-    table === "scan_job"
-      ? await prisma.$queryRaw<RawBucketCount[]>`
+  const rows = await (async () => {
+    switch (source) {
+      case "scan_job":
+        return prisma.$queryRaw<RawBucketCount[]>`
           SELECT (date_trunc(${trunc}, created_at AT TIME ZONE 'UTC'))::date AS bucket,
                  COUNT(*)::int AS count
           FROM scan_job
           WHERE created_at >= ${since}
           GROUP BY 1
-        `
-      : await prisma.$queryRaw<RawBucketCount[]>`
+        `;
+      case "analysis_finding":
+        return prisma.$queryRaw<RawBucketCount[]>`
           SELECT (date_trunc(${trunc}, created_at AT TIME ZONE 'UTC'))::date AS bucket,
                  COUNT(*)::int AS count
           FROM analysis_finding
           WHERE created_at >= ${since}
           GROUP BY 1
         `;
+      case "discovered_url":
+        return prisma.$queryRaw<RawBucketCount[]>`
+          SELECT (date_trunc(${trunc}, created_at AT TIME ZONE 'UTC'))::date AS bucket,
+                 COUNT(*)::int AS count
+          FROM discovered_url
+          WHERE created_at >= ${since}
+          GROUP BY 1
+        `;
+      case "subdomain":
+        return prisma.$queryRaw<RawBucketCount[]>`
+          SELECT (date_trunc(${trunc}, first_seen_at AT TIME ZONE 'UTC'))::date AS bucket,
+                 COUNT(*)::int AS count
+          FROM subdomain
+          WHERE first_seen_at >= ${since}
+          GROUP BY 1
+        `;
+    }
+  })();
 
   return mergeBuckets(
     template,
@@ -196,21 +221,15 @@ async function loadActivitySeries(
 export async function loadDashboardCharts(
   prisma: PrismaClient,
   opts: {
-    scanRangeKey?: ActivityRangeKey;
     findingsRangeKey?: ActivityRangeKey;
   } = {},
 ) {
-  const scanRangeKey = opts.scanRangeKey ?? DEFAULT_ACTIVITY_RANGE;
   const findingsRangeKey = opts.findingsRangeKey ?? DEFAULT_ACTIVITY_RANGE;
   const failedSince = new Date(Date.now() - 86_400_000);
 
-  const [scanSeries, findingsSeries, statusGroups, apiKeys, recentFailedCount] = await Promise.all([
-    loadActivitySeriesForRange(prisma, scanRangeKey, "scan_job"),
+  const [findingsSeries, subdomainSeries, apiKeys, recentFailedCount] = await Promise.all([
     loadActivitySeriesForRange(prisma, findingsRangeKey, "analysis_finding"),
-    prisma.scanJob.groupBy({
-      by: ["status"],
-      _count: { _all: true },
-    }),
+    loadActivitySeriesForRange(prisma, findingsRangeKey, "subdomain"),
     prisma.apiKey.findMany({
       where: { provider: EngineProvider.VIRUSTOTAL },
       orderBy: { createdAt: "asc" },
@@ -230,14 +249,15 @@ export async function loadDashboardCharts(
     }),
   ]);
 
+  const discoveryActivity: DiscoveryChartPoint[] = buildDashboardDiscoveryPoints(
+    findingsSeries.buckets,
+    findingsSeries.buckets,
+    subdomainSeries.buckets,
+  );
+
   return {
-    scanRange: scanSeries.range,
     findingsRange: findingsSeries.range,
-    scanActivity: scanSeries.buckets,
-    findingsActivity: findingsSeries.buckets,
-    scanStatusBreakdown: statusGroups
-      .map((g) => ({ status: g.status, count: g._count._all }))
-      .sort((a, b) => b.count - a.count),
+    discoveryActivity,
     apiKeyUsage: apiKeys.map((k) => ({
       label: k.label,
       usage: resolveUsageCounters(k).daily,

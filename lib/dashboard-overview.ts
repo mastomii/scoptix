@@ -129,12 +129,8 @@ export async function loadDashboardOverview(
 }
 
 /** Preserve chart range params when changing dashboard period. */
-export function dashboardPeriodSiblingParams(
-  scanRange?: string,
-  findingsRange?: string,
-): Record<string, string> {
+export function dashboardPeriodSiblingParams(findingsRange?: string): Record<string, string> {
   const params: Record<string, string> = {};
-  if (scanRange) params.scanRange = scanRange;
   if (findingsRange) params.findingsRange = findingsRange;
   return params;
 }

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
 import { prisma } from "@/lib/prisma";
 import { TopBar } from "@/components/top-bar";
+import { formatScanDateTime } from "@/lib/scan-format";
 
 export const dynamic = "force-dynamic";
 
@@ -193,11 +194,11 @@ export default async function FindingsPage({
                     </div>
                     <div className="col-span-2 text-right font-mono text-[10px] text-muted">
                       <div title="Date found by our scanner">
-                        Found: {f.createdAt.toISOString().slice(0, 16).replace("T", " ")}
+                        Found: {formatScanDateTime(f.createdAt)}
                       </div>
                       {f.discoveredUrl.externalSeenAt && (
                         <div title="Date reported in threat intel" className="mt-1 text-accent/70">
-                          Intel: {f.discoveredUrl.externalSeenAt.toISOString().slice(0, 16).replace("T", " ")}
+                          Intel: {formatScanDateTime(f.discoveredUrl.externalSeenAt)}
                         </div>
                       )}
                     </div>

@@ -1,4 +1,4 @@
-import { formatEngineLabel, formatFindingEnginesLabel, parseScanEnginesEnabled } from "@/lib/scan-engines";
+import { formatFindingEnginesLabel, parseScanEnginesEnabled } from "@/lib/scan-engines";
 import { prisma } from "@/lib/prisma";
 import {
   categorySlugForPathnameExtension,

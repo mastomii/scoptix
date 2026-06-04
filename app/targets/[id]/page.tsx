@@ -609,10 +609,10 @@ export default async function TargetDetailPage({
                     <div key={s.id} className="flex flex-col gap-1 px-5 py-3 sm:grid sm:grid-cols-12 sm:items-center sm:gap-3">
                       <div className="col-span-7 truncate font-mono text-[12px] text-cream">{s.hostnameNormalized}</div>
                       <div className="col-span-3 font-mono text-[11px] text-muted">
-                        {s.firstSeenAt.toISOString().slice(0, 16).replace("T", " ")}
+                        {formatScanDateTime(s.firstSeenAt)}
                       </div>
                       <div className="col-span-2 text-right font-mono text-[11px] text-muted">
-                        {s.lastSeenAt.toISOString().slice(0, 16).replace("T", " ")}
+                        {formatScanDateTime(s.lastSeenAt)}
                       </div>
                     </div>
                   ))
@@ -726,11 +726,11 @@ export default async function TargetDetailPage({
                         </div>
                         <div className="col-span-2 text-right font-mono text-[10px] text-muted">
                           <div title="Date found by our scanner">
-                            Found: {f.createdAt.toISOString().slice(0, 16).replace("T", " ")}
+                            Found: {formatScanDateTime(f.createdAt)}
                           </div>
                           {f.discoveredUrl.externalSeenAt && (
                             <div title="Date reported in threat intel" className="mt-1 text-accent/70">
-                              Intel: {f.discoveredUrl.externalSeenAt.toISOString().slice(0, 16).replace("T", " ")}
+                              Intel: {formatScanDateTime(f.discoveredUrl.externalSeenAt)}
                             </div>
                           )}
                         </div>
@@ -802,10 +802,7 @@ export default async function TargetDetailPage({
                           ? `/scans/${s.id}/observed`
                           : `/scans/${s.id}`;
                         const metrics = targetScanListMetrics(s);
-                        const createdLabel = s.createdAt
-                          .toISOString()
-                          .slice(0, 16)
-                          .replace("T", " ");
+                        const createdLabel = formatScanDateTime(s.createdAt);
 
                         return (
                           <Link

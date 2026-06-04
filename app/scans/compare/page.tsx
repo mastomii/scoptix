@@ -3,13 +3,9 @@ import { ScanJobStatus } from "@prisma/client";
 import { PageHeader } from "@/components/page-header";
 import { prisma } from "@/lib/prisma";
 import { TopBar } from "@/components/top-bar";
+import { formatScanDateTime } from "@/lib/scan-format";
 
 export const dynamic = "force-dynamic";
-
-function formatDateTime(value: Date | null) {
-  if (!value) return "—";
-  return value.toISOString().slice(0, 16).replace("T", " ");
-}
 
 export default async function ScanComparisonPickerPage() {
   const scans = await prisma.scanJob.findMany({
@@ -45,7 +41,7 @@ export default async function ScanComparisonPickerPage() {
                 >
                   <span className="font-medium text-cream">{scan.targetDomain.domainNormalized}</span>
                   <span className="text-sm text-muted">
-                    Finished {formatDateTime(scan.completedAt)} · {scan.id.slice(0, 8)}
+                    Finished {formatScanDateTime(scan.completedAt)} · {scan.id.slice(0, 8)}
                   </span>
                 </Link>
               ))

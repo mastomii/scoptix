@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 import { ACTIVITY_RANGES, type ActivityRangeKey } from "@/lib/dashboard-stats";
 
-type RangeParam = "scanRange" | "findingsRange";
+type RangeParam = "findingsRange";
 
 export function DashboardChartRangeMenu({
   param,

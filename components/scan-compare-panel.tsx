@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { formatScanDateTime } from "@/lib/scan-format";
 
 type CompareOption = {
   id: string;
@@ -53,11 +54,6 @@ type CompareDiffData =
       added: Array<FindingDiffItem | SubdomainDiffItem | UrlDiffItem | IpDiffItem>;
       removed: Array<FindingDiffItem | SubdomainDiffItem | UrlDiffItem | IpDiffItem>;
     };
-
-function formatDateTime(value: Date | null) {
-  if (!value) return "—";
-  return value.toISOString().slice(0, 16).replace("T", " ");
-}
 
 function renderDiffItem(
   tab: "findings" | "subdomains" | "urls" | "ips",
@@ -181,8 +177,8 @@ export function ScanComparePanel({
               <option value="">Select a scan…</option>
               {compareOptions.map((option) => (
                 <option key={option.id} value={option.id}>
-                  {formatDateTime(option.createdAt)}
-                  {option.completedAt ? ` · finished ${formatDateTime(option.completedAt)}` : ""}
+                  {formatScanDateTime(option.createdAt)}
+                  {option.completedAt ? ` · finished ${formatScanDateTime(option.completedAt)}` : ""}
                   {option.observedVersion == null ? " · legacy snapshot limits" : ""}
                 </option>
               ))}
@@ -226,7 +222,7 @@ export function ScanComparePanel({
           <div className="text-[12px] text-muted">
             Baseline scan:{" "}
             <span className="font-mono text-cream">
-              {formatDateTime(selectedCompareScan.createdAt)}
+              {formatScanDateTime(selectedCompareScan.createdAt)}
             </span>
           </div>
 

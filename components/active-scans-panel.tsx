@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { canViewPartialObservedResults } from "@/lib/scan-observed";
+import { formatScanDateTime } from "@/lib/scan-format";
 
 const DEFAULT_VISIBLE_SCANS = 3;
 
@@ -24,10 +25,6 @@ type ActiveScanItem = {
     domainNormalized: string;
   };
 };
-
-function formatDateTime(value: string) {
-  return value.slice(0, 16).replace("T", " ");
-}
 
 function formatProgress(scan: ActiveScanItem) {
   const current = scan.progressCurrent ?? 0;
@@ -98,7 +95,7 @@ export function ActiveScansPanel({ scans }: { scans: ActiveScanItem[] }) {
                     {scan.targetDomain.domainNormalized}
                   </div>
                   <div className="mt-1 text-[10px] text-muted">
-                    Created {formatDateTime(scan.createdAt)}
+                    Created {formatScanDateTime(scan.createdAt)}
                   </div>
                 </div>
 

@@ -89,12 +89,6 @@ function sp(v: string | string[] | undefined): string {
   return "";
 }
 
-function formatDateTime(value: Date | string | null | undefined) {
-  if (!value) return "—";
-  const iso = typeof value === "string" ? value : value.toISOString();
-  return iso.slice(0, 16).replace("T", " ");
-}
-
 function countLabel(value: number | null) {
   return value == null ? "—" : value.toLocaleString();
 }
@@ -924,14 +918,14 @@ export default async function ScanObservedPage({
                         </div>
                         <div className="col-span-2 text-left font-mono text-[10px] text-muted lg:text-right">
                           <div title="Date found by this scan">
-                            Found: {formatDateTime(finding.createdAt)}
+                            Found: {formatScanDateTime(finding.createdAt)}
                           </div>
                           {finding.discoveredUrl.externalSeenAt && (
                             <div
                               title="Date reported in external intel"
                               className="mt-1 text-accent/70"
                             >
-                              Intel: {formatDateTime(finding.discoveredUrl.externalSeenAt)}
+                              Intel: {formatScanDateTime(finding.discoveredUrl.externalSeenAt)}
                             </div>
                           )}
                         </div>
@@ -1020,10 +1014,10 @@ export default async function ScanObservedPage({
                             {subdomain.hostnameNormalized}
                           </div>
                           <div className="col-span-3 font-mono text-[11px] text-muted">
-                            {formatDateTime(subdomain.subdomain?.firstSeenAt)}
+                            {formatScanDateTime(subdomain.subdomain?.firstSeenAt)}
                           </div>
                           <div className="col-span-3 text-left font-mono text-[11px] text-muted sm:text-right">
-                            {formatDateTime(subdomain.subdomain?.lastSeenAt)}
+                            {formatScanDateTime(subdomain.subdomain?.lastSeenAt)}
                           </div>
                         </div>
                       ))
@@ -1053,10 +1047,10 @@ export default async function ScanObservedPage({
                               </div>
                             </div>
                             <div className="col-span-3 font-mono text-[11px] text-muted">
-                              {formatDateTime(subdomain.firstSeenAt)}
+                              {formatScanDateTime(subdomain.firstSeenAt)}
                             </div>
                             <div className="col-span-3 text-left font-mono text-[11px] text-muted sm:text-right">
-                              {formatDateTime(subdomain.lastSeenAt)}
+                              {formatScanDateTime(subdomain.lastSeenAt)}
                             </div>
                           </div>
                         );
@@ -1171,7 +1165,7 @@ export default async function ScanObservedPage({
                             )}
                           </div>
                           <div className="mt-1 font-mono text-[10px] text-muted">
-                            Observed: {formatDateTime(url.createdAt)}
+                            Observed: {formatScanDateTime(url.createdAt)}
                           </div>
                         </div>
                       ))

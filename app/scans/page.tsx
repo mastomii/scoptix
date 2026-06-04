@@ -6,6 +6,7 @@ import { ScanHistoryPanel } from "@/components/scans/scan-history-panel";
 import { prisma } from "@/lib/prisma";
 import { countScanObservedFromDb } from "@/lib/scan-observed-counts";
 import { TopBar } from "@/components/top-bar";
+import { formatScanDateTime } from "@/lib/scan-format";
 
 export const dynamic = "force-dynamic";
 
@@ -17,11 +18,6 @@ const STATUS_STYLE: Record<string, string> = {
   CANCELLED: "bg-muted/10 text-muted",
   PAUSED: "bg-warn/10 text-warn",
 };
-
-function formatDateTime(value: Date | null) {
-  if (!value) return "—";
-  return value.toISOString().slice(0, 16).replace("T", " ");
-}
 
 /** URLs recorded in this scan's snapshot (scan_observed_url), not target-global totals. */
 function formatSnapshotUrlProgress(urlCount: number) {
@@ -71,8 +67,8 @@ export default async function ScansPage() {
       phase: scan.phase ?? "—",
       progressLabel: formatSnapshotUrlProgress(snapshot.urls),
       findingsCount: snapshot.findings.toLocaleString(),
-      finishedLabel: formatDateTime(scan.completedAt),
-      createdLabel: formatDateTime(scan.createdAt),
+      finishedLabel: formatScanDateTime(scan.completedAt),
+      createdLabel: formatScanDateTime(scan.createdAt),
       href: isCompleted ? `/scans/${scan.id}/observed` : `/scans/${scan.id}`,
     };
   });
