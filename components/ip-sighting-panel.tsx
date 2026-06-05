@@ -206,7 +206,7 @@ function IpSightingAssociationTimeline({
               <div className="relative flex w-5 shrink-0 justify-center">
                 <div
                   className={[
-                    "relative z-10 size-2.5 shrink-0 rounded-full ring-4 ring-lift",
+                    "relative z-10 size-2.5 shrink-0 rounded-full ring-4 ring-[var(--glass-panel-bg)]",
                     item.isLatest ? "bg-accent" : "bg-muted",
                   ].join(" ")}
                   aria-hidden
@@ -320,7 +320,7 @@ export function IpSightingPanel({ ipResolutionId, scanJobId, onClose }: IpSighti
         role="dialog"
         aria-modal="true"
         aria-labelledby="ip-panel-title"
-        className="fixed inset-y-0 right-0 z-[100] flex w-full max-w-[560px] flex-col border-l border-line bg-lift shadow-lift"
+        className="glass-panel fixed inset-y-0 right-0 z-[100] flex w-full max-w-[560px] flex-col rounded-none border-l border-line shadow-lift"
       >
         <div className="shrink-0 border-b border-line px-5 pb-4 pt-5">
           <div className="flex items-start justify-between gap-3">
@@ -338,7 +338,7 @@ export function IpSightingPanel({ ipResolutionId, scanJobId, onClose }: IpSighti
                   disabled={loading || !data?.ipAddress}
                   aria-label={copied ? "IP copied" : "Copy IP address"}
                   title={copied ? "Copied" : "Copy IP address"}
-                  className="flex size-7 shrink-0 items-center justify-center rounded-md text-muted transition-colors hover:bg-white/5 hover:text-cream disabled:pointer-events-none disabled:opacity-30"
+                  className="flex size-7 shrink-0 items-center justify-center rounded-md text-muted transition-colors hover:bg-[var(--nav-hover-bg)] hover:text-cream disabled:pointer-events-none disabled:opacity-30"
                 >
                   <IconCopy className="size-3.5" />
                 </button>
@@ -348,7 +348,7 @@ export function IpSightingPanel({ ipResolutionId, scanJobId, onClose }: IpSighti
               type="button"
               onClick={onClose}
               aria-label="Close panel"
-              className="flex size-8 shrink-0 items-center justify-center rounded-lg text-muted transition-colors hover:bg-white/5 hover:text-cream"
+              className="flex size-8 shrink-0 items-center justify-center rounded-lg text-muted transition-colors hover:bg-[var(--nav-hover-bg)] hover:text-cream"
             >
               <IconX className="size-4" />
             </button>
