@@ -100,6 +100,8 @@ export function ScanDetailClient({ id }: { id: string }) {
     T3_WAYBACK_APEX: "Phase 3 — Wayback Machine (root)",
     T4_WAYBACK_SUBDOMAINS: "Phase 4 — Wayback Machine (subdomains)",
     T5_CONSOLIDATE: "Phase 5 — Consolidating",
+    T5B_WAPPALYZER: "Phase 5B — Wappalyzer",
+    T5C_CVE_MATCH: "Phase 5C — CVE Matching",
     T6_ANALYSIS: "Phase 6 — Analyzing URLs",
   };
 
@@ -179,7 +181,7 @@ export function ScanDetailClient({ id }: { id: string }) {
               <Link href={`/scans/${scan.id}/observed`} className="font-semibold text-accent underline-offset-2 hover:underline">
                 Open observed snapshot
               </Link>{" "}
-              to review VirusTotal findings while Wayback continues.
+              to review early results while the scan continues.
             </div>
           )}
           <div className="space-y-2">

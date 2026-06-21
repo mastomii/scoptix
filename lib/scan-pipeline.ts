@@ -94,7 +94,9 @@ async function fetchReportWithRotator(
   scanJobId?: string,
 ): Promise<VtDomainReportV2> {
   for (;;) {
-    const k = await acquireVtKey(prisma, redis);
+    const k = await acquireVtKey(prisma, redis, async () => {
+      if (scanJobId) await checkCancelled(prisma, scanJobId);
+    });
     const proxy = k.proxyUrl || globalProxy;
 
     // Max 5 retries per key acquisition — prevents locking for 12+ minutes on one subdomain.

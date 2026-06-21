@@ -95,7 +95,7 @@ async function markGlobalRequest(redis: Redis) {
  * - Per-key daily cap (500 req/day — disables key when reached, re-enables next UTC day)
  * - Per-key backoff (when 429/403 received)
  */
-export async function acquireVtKey(prisma: PrismaClient, redis: Redis): Promise<ResolvedVtKey> {
+export async function acquireVtKey(prisma: PrismaClient, redis: Redis, onWait?: () => Promise<void>): Promise<ResolvedVtKey> {
   const appKey = await resolveAppEncryptionKey(prisma);
 
   for (;;) {
@@ -109,6 +109,7 @@ export async function acquireVtKey(prisma: PrismaClient, redis: Redis): Promise<
 
     if (keys.length === 0) {
       // No active keys — wait briefly and retry
+      await onWait?.();
       await sleep(1_000);
       continue;
     }
@@ -140,6 +141,7 @@ export async function acquireVtKey(prisma: PrismaClient, redis: Redis): Promise<
 
     if (!picked) {
       // All keys are at capacity (rate-limited or in backoff) — spin briefly
+      await onWait?.();
       await sleep(250);
       continue;
     }
